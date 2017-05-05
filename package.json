@@ -2,7 +2,7 @@
   "name": "js-undo-manager",
   "version": "1.0.0",
   "description": "Simple JavaScript undo/redo command manager supporting transactions with no dependencies",
-  "main": "src/js-undo-manager.js",
+  "main": "src/js-undo-manager.min.js",
   "repository": "git@github.com:agrinko/js-undo-manager.git",
   "author": "agrinko <grinko.alexey@gmail.com>",
   "license": "MIT",
