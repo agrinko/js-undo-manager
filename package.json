@@ -1,0 +1,34 @@
+{
+  "name": "js-undo-manager",
+  "version": "1.0.0",
+  "description": "Simple JavaScript undo/redo command manager supporting transactions with no dependencies",
+  "main": "src/js-undo-manager.js",
+  "repository": "git@github.com:agrinko/js-undo-manager.git",
+  "author": "agrinko <grinko.alexey@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "gulp build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "javascript",
+    "js",
+    "undo",
+    "redo",
+    "command",
+    "manager",
+    "transaction"
+  ],
+  "bugs": {
+    "url": "https://github.com/agrinko/js-undo-manager/issues",
+    "email": "grinko.alexey@gmail.com"
+  },
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-preset-es2015": "^6.24.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^2.1.2"
+  }
+}
