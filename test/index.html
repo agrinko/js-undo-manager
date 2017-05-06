@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tests: JS Undo Manager</title>
+    <link rel="stylesheet" href="css/mocha.css" />
+</head>
+<body>
+    <div id="mocha"></div>
+    <div id="messages"></div>
+    <div id="fixtures"></div>
+    <div id="app-layout"></div>
+    <script src="vendor/sinon.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script>
+        mocha.setup("bdd");
+        window.should = chai.should();
+    </script>
+
+    <!-- testable scripts -->
+    <script src="../src/js-undo-manager.min.js"></script>
+    <!-- end testable scripts -->
+
+    <script src="runner.js"></script>
+</body>
+</html>
