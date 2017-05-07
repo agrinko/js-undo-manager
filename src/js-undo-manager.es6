@@ -257,10 +257,12 @@ class TransactionManager {
 
         this._reset();
 
-        this.tracker.record({
-            redo: TransactionManager._execForward.bind(null, seq),
-            undo: TransactionManager._execBack.bind(null, seq)
-        });
+        if (seq.length > 0) {
+            this.tracker.record({
+                redo: TransactionManager._execForward.bind(null, seq),
+                undo: TransactionManager._execBack.bind(null, seq)
+            });
+        }
 
         this.tracker.log("End transaction");
     }
@@ -272,22 +274,22 @@ class TransactionManager {
         this.tracker.log("Cancel transaction");
     }
 
-    _reset() {
-        this.state = TransactionManager.PENDING;
-        this.sequence = [];
-    }
-
     isInProgress() {
         return this.state === TransactionManager.IN_PROGRESS;
     }
 
     isPending() {
-        return !this.isInProgress();
+        return this.state === TransactionManager.PENDING;
     }
 
     _record(command) {
         this.sequence.push(command);
         this.tracker.log("Recording command in transaction...", command);
+    }
+
+    _reset() {
+        this.state = TransactionManager.PENDING;
+        this.sequence = [];
     }
 }
 

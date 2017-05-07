@@ -21,7 +21,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      * Default settings
      */
     var DEFAULTS = {
-        limit: 30, //maximum commands stack size
+        limit: 100, //maximum commands stack size
         debug: false //whether to emit execution status in console
     };
 
@@ -34,7 +34,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         function JSUndoManager(options) {
             _classCallCheck(this, JSUndoManager);
 
-            options || (options = DEFAULTS);
+            options = assign({}, DEFAULTS, options);
 
             this.transaction = new TransactionManager(this);
             this.limit = options.limit;
@@ -321,10 +321,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 this._reset();
 
-                this.tracker.record({
-                    redo: TransactionManager._execForward.bind(null, seq),
-                    undo: TransactionManager._execBack.bind(null, seq)
-                });
+                if (seq.length > 0) {
+                    this.tracker.record({
+                        redo: TransactionManager._execForward.bind(null, seq),
+                        undo: TransactionManager._execBack.bind(null, seq)
+                    });
+                }
 
                 this.tracker.log("End transaction");
             }
@@ -337,12 +339,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this.tracker.log("Cancel transaction");
             }
         }, {
-            key: "_reset",
-            value: function _reset() {
-                this.state = TransactionManager.PENDING;
-                this.sequence = [];
-            }
-        }, {
             key: "isInProgress",
             value: function isInProgress() {
                 return this.state === TransactionManager.IN_PROGRESS;
@@ -350,13 +346,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "isPending",
             value: function isPending() {
-                return !this.isInProgress();
+                return this.state === TransactionManager.PENDING;
             }
         }, {
             key: "_record",
             value: function _record(command) {
                 this.sequence.push(command);
                 this.tracker.log("Recording command in transaction...", command);
+            }
+        }, {
+            key: "_reset",
+            value: function _reset() {
+                this.state = TransactionManager.PENDING;
+                this.sequence = [];
             }
         }]);
 
@@ -367,6 +369,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     TransactionManager.IN_PROGRESS = 1;
 
     /////////// SOURCE CODE END ///////////////
+
+    // HELPER FUNCTIONS
+    /**
+     * Emulate ES6 Object.assign behaviour if native function is not defined
+     */
+    var assign = Object.assign || function (target) {
+        for (var i = 1; i < arguments.length; i++) {
+            for (var key in arguments[i]) {
+                if (arguments[i].hasOwnProperty(key)) {
+                    target[key] = arguments[i][key];
+                }
+            }
+        }
+
+        return target;
+    };
 
     // EXPOSING THE COMPONENT
 
