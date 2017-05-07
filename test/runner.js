@@ -82,7 +82,7 @@ describe("Command Manager", function () {
             }).should.not.throw(TypeError);
         });
 
-        it("record(new Function, new Function}) should not throw", function () {
+        it("record(new Function, new Function) should not throw", function () {
             cm.record.bind(cm, new Function(), new Function()).should.not.throw(TypeError);
         });
 

@@ -15,7 +15,7 @@
  * Default settings
  */
 const DEFAULTS = {
-    limit: 30,      //maximum commands stack size
+    limit: 100,     //maximum commands stack size
     debug: false    //whether to emit execution status in console
 };
 
@@ -23,10 +23,9 @@ const DEFAULTS = {
  * Main class
  * @class JSUndoManager
  */
-
 class JSUndoManager {
     constructor(options) {
-        options || (options = DEFAULTS);
+        options = assign({}, DEFAULTS, options);
 
         this.transaction = new TransactionManager(this);
         this.limit = options.limit;
@@ -296,6 +295,22 @@ TransactionManager.PENDING = 0;
 TransactionManager.IN_PROGRESS = 1;
 
 /////////// SOURCE CODE END ///////////////
+
+// HELPER FUNCTIONS
+/**
+ * Emulate ES6 Object.assign behaviour if native function is not defined
+ */
+let assign = Object.assign || function (target) {
+    for (let i = 1; i < arguments.length; i++ ) {
+        for (let key in arguments[i]) {
+            if (arguments[i].hasOwnProperty(key)) {
+                target[key] = arguments[i][key];
+            }
+        }
+    }
+
+    return target;
+};
 
 // EXPOSING THE COMPONENT
 
