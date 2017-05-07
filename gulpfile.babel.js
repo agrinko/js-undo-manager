@@ -28,13 +28,13 @@ gulp.task("babel", () => {
 });
 
 gulp.task("babel:test", () => {
-    return gulp.src("test/*.es6")
+    return gulp.src("test/units/*.es6")
         .pipe(babel())
-        .pipe(gulp.dest("test"));
+        .pipe(gulp.dest("test/units"));
 });
 
 gulp.task("test", ["babel:test"], () => {
-    return gulp.src(`test/index.html`)
+    return gulp.src("test/index.html")
         .pipe(mochaPhantomJS({
             phantomjs: {
                 useColors: true

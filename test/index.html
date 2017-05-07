@@ -16,12 +16,29 @@
     <script>
         mocha.setup("bdd");
         window.should = chai.should();
+
+        function printError() {
+            document.getElementById("messages").innerHTML =
+                "Unit tests have not been compiled yet!<br/>" +
+                "Please execute <strong>yarn test</strong> command before opening tests in browser.";
+        }
     </script>
 
     <!-- testable scripts -->
     <script src="../src/js-undo-manager.js"></script>
     <!-- end testable scripts -->
 
-    <script src="runner.js"></script>
+    <!-- units -->
+    <script src="units/command-manager.unit.js" onerror="printError();"></script>
+    <script src="units/transactions.unit.js"></script>
+    <!-- end units -->
+
+    <script>
+        if (window.mochaPhantomJS) {
+            mochaPhantomJS.run();
+        } else {
+            mocha.run();
+        }
+    </script>
 </body>
 </html>
