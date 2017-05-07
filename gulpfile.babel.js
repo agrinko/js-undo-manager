@@ -35,7 +35,11 @@ gulp.task("babel:test", () => {
 
 gulp.task("test", ["babel:test"], () => {
     return gulp.src(`test/index.html`)
-        .pipe(mochaPhantomJS())
+        .pipe(mochaPhantomJS({
+            phantomjs: {
+                useColors: true
+            }
+        }))
         .on("error", () => {
             gulp.emit("end");
         });

@@ -258,6 +258,173 @@ describe("Command Manager", function () {
     });
 });
 
+describe("Transactions", function () {
+    describe("execution in transactions", function () {
+        var cm = new JSUndoManager();
+        var i = 0;
+        var decrement = function decrement() {
+            i--;
+        };
+        var increment = function increment() {
+            i++;
+        };
+
+        it("should execute 2 functions recorded during transaction using `execute` function", function () {
+            cm.transaction.begin();
+            cm.execute(increment, decrement);
+            cm.execute(increment, decrement);
+            cm.transaction.end();
+            i.should.equal(2);
+        });
+
+        it("stack size should equal 1", function () {
+            cm.getSize().should.equal(1);
+        });
+
+        it("should undo 2 functions recorded during transaction with a single call", function () {
+            cm.undo();
+            i.should.equal(0);
+        });
+
+        it("should redo 2 previous functions with a single call", function () {
+            cm.redo();
+            i.should.equal(2);
+        });
+
+        it("single command + transaction of 3 commands + single command should execute 5 functions", function () {
+            i = 0;
+
+            cm.execute(increment, decrement);
+
+            cm.transaction.begin();
+            cm.execute(increment, decrement);
+            cm.execute(increment, decrement);
+            cm.execute(increment, decrement);
+            cm.transaction.end();
+
+            cm.execute(increment, decrement);
+            i.should.equal(5);
+        });
+
+        it("undo single command + undo transaction of 3 commands should revert 4 function", function () {
+            cm.undo().undo();
+            i.should.equal(1);
+        });
+
+        it("undo single command left should revert 1 function after all", function () {
+            cm.undo();
+            i.should.equal(0);
+        });
+
+        it("redo single command should execute 1 function", function () {
+            cm.redo();
+            i.should.equal(1);
+        });
+
+        it("redo transaction of 3 commands should execute 3 functions in a single call", function () {
+            cm.redo();
+            i.should.equal(4);
+        });
+
+        it("should record another one transaction of 2 functions", function () {
+            cm.transaction.begin();
+            cm.execute(increment, decrement);
+            cm.execute(increment, decrement);
+            cm.transaction.end();
+            i.should.equal(6);
+        });
+
+        it("should revert 5 commands by undoing 2 previous transactions", function () {
+            cm.undo().undo();
+            i.should.equal(1);
+        });
+
+        it("should not record commands if empty transaction was closed", function () {
+            cm.reset();
+
+            cm.transaction.begin();
+            cm.transaction.end();
+
+            cm.getSize().should.equal(0);
+            cm.canUndo().should.be.false;
+        });
+    });
+
+    describe("cancelled transactions", function () {
+        var cm = new JSUndoManager();
+        var i = 0;
+        var decrement = function decrement() {
+            i--;
+        };
+        var increment = function increment() {
+            i++;
+        };
+
+        it("should execute 2 functions right off inside of transaction with `execute` command", function () {
+            cm.transaction.begin();
+            cm.execute(increment, decrement);
+            cm.execute(increment, decrement);
+            i.should.equal(2);
+        });
+
+        it("should revert recorded commands when transaction is cancelled", function () {
+            cm.transaction.cancel();
+            i.should.equal(0);
+        });
+
+        it("should forget recorded commands from cancelled transaction", function () {
+            cm.canRedo().should.be.false;
+            cm.canUndo().should.be.false;
+            cm.getSize().should.equal(0);
+        });
+    });
+
+    describe("transaction state functions", function () {
+        var cm = new JSUndoManager();
+        var i = 0;
+        var decrement = function decrement() {
+            i--;
+        };
+        var increment = function increment() {
+            i++;
+        };
+
+        it("transaction.isInProgress() should be false by default", function () {
+            cm.transaction.isInProgress().should.be.false;
+        });
+
+        it("transaction.isInProgress() should return true when a transaction begins", function () {
+            cm.transaction.begin();
+            cm.transaction.isInProgress().should.be.true;
+        });
+
+        it("transaction.isInProgress() should return true after a command executed during transaction", function () {
+            cm.execute(increment, decrement);
+            cm.transaction.isInProgress().should.be.true;
+        });
+
+        it("transaction.isInProgress() should return false when a transaction is canceled", function () {
+            cm.transaction.cancel();
+            cm.transaction.isInProgress().should.be.false;
+            i.should.equal(0);
+        });
+
+        it("transaction.isPending() should return true by default", function () {
+            cm.transaction.isPending().should.be.true;
+        });
+
+        it("transaction.isPending() should return false during transaction", function () {
+            cm.transaction.begin();
+            cm.transaction.isPending().should.be.false;
+        });
+
+        it("transaction.isPending() should return true after transaction is finished", function () {
+            cm.transaction.end();
+            cm.transaction.isPending().should.be.true;
+        });
+    });
+});
+
 if (window.mochaPhantomJS) {
     mochaPhantomJS.run();
 } else {

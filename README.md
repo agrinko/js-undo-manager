@@ -4,6 +4,4 @@ Simple JavaScript undo/redo command manager supporting transactions with no depe
 
 #TODO
 
-- add test coverage
-- increase coverage to over 80%
 - write documentation
