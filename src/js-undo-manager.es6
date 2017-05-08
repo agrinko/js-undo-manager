@@ -15,8 +15,9 @@
  * Default settings
  */
 const DEFAULTS = {
-    limit: 100,     //maximum commands stack size
-    debug: false    //whether to emit execution status in console
+    limit: 100,         // maximum commands stack size
+    debug: false,       // whether to emit execution status in console
+    bindHotKeys: false  // whether to bind "undo" and "redo" commands to "Ctrl+Z", "Ctrl+Y" & "Ctrl+Shift+Z" hot keys
 };
 
 /**
@@ -27,6 +28,7 @@ class JSUndoManager {
     constructor(options={}) {
         options.limit = options.hasOwnProperty("limit") ? options.limit : DEFAULTS.limit;
         options.debug = options.hasOwnProperty("debug") ? options.debug : DEFAULTS.debug;
+        options.bindHotKeys = options.hasOwnProperty("bindHotKeys") ? options.bindHotKeys : DEFAULTS.bindHotKeys;
 
         this.transaction = new TransactionManager(this);
         this.limit = options.limit;
@@ -34,6 +36,32 @@ class JSUndoManager {
         this.reset();
 
         this.log(`Initialized with stack limit of ${this.limit} commands`);
+
+        if (options.bindHotKeys) {
+            this.bindHotKeys();
+        }
+    }
+
+    /**
+     * Bind 'undo' and 'redo' actions to 'Ctrl+Z', 'Ctrl+Y' & 'Ctrl+Shift+Z' hot keys.
+     * It is a basic implementation for quick testing and should be replaced with custom event handlers
+     * for more flexible processing.
+     * @returns {JSUndoManager}
+     */
+    bindHotKeys() {
+        this.log("Bound 'undo' and 'redo' actions to 'Ctrl+Z', 'Ctrl+Y' & 'Ctrl+Shift+Z' hot keys");
+
+        document.addEventListener("keydown", (e) => {
+            let Y = 89, Z = 90;
+
+            if (e.keyCode === Z && e.ctrlKey && !e.shiftKey) {
+                this.undo();
+            } else if (e.keyCode === Z && e.ctrlKey && e.shiftKey || e.keyCode === Y && e.ctrlKey) {
+                this.redo();
+            }
+        });
+
+        return this;
     }
 
     /**

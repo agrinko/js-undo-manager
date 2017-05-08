@@ -21,8 +21,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      * Default settings
      */
     var DEFAULTS = {
-        limit: 100, //maximum commands stack size
-        debug: false //whether to emit execution status in console
+        limit: 100, // maximum commands stack size
+        debug: false, // whether to emit execution status in console
+        bindHotKeys: false // whether to bind "undo" and "redo" commands to "Ctrl+Z", "Ctrl+Y" & "Ctrl+Shift+Z" hot keys
     };
 
     /**
@@ -38,6 +39,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
             options.limit = options.hasOwnProperty("limit") ? options.limit : DEFAULTS.limit;
             options.debug = options.hasOwnProperty("debug") ? options.debug : DEFAULTS.debug;
+            options.bindHotKeys = options.hasOwnProperty("bindHotKeys") ? options.bindHotKeys : DEFAULTS.bindHotKeys;
 
             this.transaction = new TransactionManager(this);
             this.limit = options.limit;
@@ -45,17 +47,49 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             this.reset();
 
             this.log("Initialized with stack limit of " + this.limit + " commands");
+
+            if (options.bindHotKeys) {
+                this.bindHotKeys();
+            }
         }
 
         /**
-         * Remember executed command containing "redo" and "undo" functions
-         * @param {Object|Function} command - either an object with "redo" and "undo" functions or "redo" function itself
-         * @param {Function} [undo] - "undo" function, used if the first argument is also a function
+         * Bind 'undo' and 'redo' actions to 'Ctrl+Z', 'Ctrl+Y' & 'Ctrl+Shift+Z' hot keys.
+         * It is a basic implementation for quick testing and should be replaced with custom event handlers
+         * for more flexible processing.
          * @returns {JSUndoManager}
          */
 
 
         _createClass(JSUndoManager, [{
+            key: "bindHotKeys",
+            value: function bindHotKeys() {
+                var _this = this;
+
+                this.log("Bound 'undo' and 'redo' actions to 'Ctrl+Z', 'Ctrl+Y' & 'Ctrl+Shift+Z' hot keys");
+
+                document.addEventListener("keydown", function (e) {
+                    var Y = 89,
+                        Z = 90;
+
+                    if (e.keyCode === Z && e.ctrlKey && !e.shiftKey) {
+                        _this.undo();
+                    } else if (e.keyCode === Z && e.ctrlKey && e.shiftKey || e.keyCode === Y && e.ctrlKey) {
+                        _this.redo();
+                    }
+                });
+
+                return this;
+            }
+
+            /**
+             * Remember executed command containing "redo" and "undo" functions
+             * @param {Object|Function} command - either an object with "redo" and "undo" functions or "redo" function itself
+             * @param {Function} [undo] - "undo" function, used if the first argument is also a function
+             * @returns {JSUndoManager}
+             */
+
+        }, {
             key: "record",
             value: function record(command) {
                 if (command && typeof command.redo === "function" && typeof command.undo === "function") {
