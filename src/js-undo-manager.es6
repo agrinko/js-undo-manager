@@ -58,21 +58,17 @@ class JSUndoManager {
 
     /**
      * Execute function and record it with its opposite "undo" function
-     * @param {Function} doFunction
-     * @param {Function} undoFunction
+     * @param {Object|Function} command - either an object with "redo" and "undo" functions or "redo" function itself
+     * @param {Function} [undo] - "undo" function, used if the first argument is also a function
      * @returns {JSUndoManager}
      */
-    execute(doFunction, undoFunction) {
-        if (typeof doFunction === "function" && typeof undoFunction === "function") {
-            this.log("Executing function...");
-            doFunction();
-            this._record({
-                redo: doFunction,
-                undo: undoFunction
-            });
-        } else {
-            throw new TypeError("JSUndoManager.execute(): unexpected arguments");
-        }
+    execute(command) {
+        let doFunction = command.redo || command;
+
+        this.record.apply(this, arguments);
+
+        this.log("Executing function...");
+        doFunction();
 
         return this;
     }

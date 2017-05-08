@@ -116,7 +116,17 @@ describe("Command Manager", () => {
         it("execute(fun1, fun2) should execute a function and record it", () => {
             let fun1 = sinon.spy();
 
+            cm.reset();
             cm.execute(fun1, new Function).getSize().should.equal(1);
+            cm.canUndo().should.be.true;
+            fun1.calledOnce.should.be.true;
+        });
+
+        it("execute({redo: fun1, undo: fun2}) should execute 'redo' function and record it", () => {
+            let fun1 = sinon.spy();
+
+            cm.reset();
+            cm.execute({redo: fun1, undo: new Function}).getSize().should.equal(1);
             cm.canUndo().should.be.true;
             fun1.calledOnce.should.be.true;
         });
