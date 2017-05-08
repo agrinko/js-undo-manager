@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JS Undo Manager by A. Grinko - DEMO</title>
+    <script src="src/js-undo-manager.js"></script>
+    <style>
+        #demo-box {
+            height: 300px;
+            margin-bottom: 14px;
+            border: 3px double seagreen;
+            background: #f6f6f6;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        #demo-box .dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            margin-left: -10px;
+            margin-top: -10px;
+            border-radius: 20px;
+            line-height: 20px;
+            text-align: center;
+            font-size: smaller;
+            background: black;
+            color: white;
+            cursor: inherit;
+        }
+    </style>
+</head>
+<body>
+    <h2>Example 1</h2>
+    <p>Enter some text below. Changes are applied and recorded only after input loses its focus.</p>
+    <input type="text" id="input"/>
+    <br/>
+    <br/>
+    <button id="undo" type="button">Undo</button>
+    <button id="redo" type="button">Redo</button>
+    <p><em>Note!</em> If you notice that <strong>Ctrl+Z</strong>/<strong>Ctrl+Y</strong> hot keys work in this example,
+        it's your browser's default behaviour. This example is programmed to work only with the buttons above.</p>
+    <script>
+        (function() {
+            var um = new JSUndoManager({debug:true});
+            var input = document.getElementById("input");
+            var redo = document.getElementById("redo");
+            var undo = document.getElementById("undo");
+
+            var prevValue = input.value; // way to know previous value after "change" event
+
+            input.addEventListener("change", function() {
+                var prev = prevValue;
+                var value = input.value;
+
+                prevValue = value;
+
+                um.record({
+                    redo: function() {
+                        input.value = value;
+                        // update previous value manually because we don't trigger "change" event here
+                        prevValue = value;
+                    },
+                    undo: function() {
+                        input.value = prev;
+                        prevValue = prev;
+                    }
+                });
+            });
+
+            redo.addEventListener("click", function() { um.redo(); });
+            undo.addEventListener("click", function() { um.undo(); });
+        })();
+    </script>
+
+    <h2>Example 2</h2>
+    <p>Click somewhere in the box to add points:</p>
+    <div id="demo-box"></div>
+    <p>Now press <strong>Ctrl+Z</strong> to revert changes and <strong>Ctrl+Y</strong> or <strong>Ctrl+Shift+Z</strong>
+        to perform them again</p>
+    <p>This example works with up to 40 commands in history. When this number is reached, the oldes commands will be
+        "forgotten" (you can't undo them). This number affects memory usage and can be dynamically adjusted in code.</p>
+    <p>Check console to see some debug information from the command manager.</p>
+    <p><em>Note: keyboard processing is not included into JS Command Manager. Keyboard events are bound
+        with its "undo" and "redo" methods with simple event handlers in this demo.</em></p>
+    <br/>
+    <details>
+        <summary>Click here to see the source code</summary>
+        <pre>
+var um = new JSUndoManager({
+    limit: 40,
+    debug: true,
+    bindHotKeys: true
+});
+var box = document.getElementById("demo-box");
+var colours = ["red", "black", "blue", "green", "orange", "pink", "olive", "seagreen", "skyblue", "grey"];
+var counter = 0;
+
+box.addEventListener("click", function(e) {
+    var data = makeData(e.pageX, e.pageY);
+
+    // important: we separate data from DOM here;
+    // all dots are initialized with random color, so if we didn't remember it here in the data variable,
+    // each "redo" call would initialize new dot with a random color instead of creating same dot as before
+    um.execute({
+        redo: function() { createDot(data); },
+        undo: function() { removeDot(data); }
+    });
+});
+
+function makeData(x, y) {
+    counter++;
+
+    return {
+        x: x,
+        y: y,
+        index: counter,
+        id: "dot_" + counter,
+        bg: colours[Math.floor(Math.random()*colours.length)]
+    };
+}
+
+function createDot(data) {
+    var dot = document.createElement("DIV");
+    dot.className = "dot";
+    dot.innerText = data.index;
+    dot.id = data.id;
+    dot.style.backgroundColor = data.bg;
+    dot.style.left = data.x + "px";
+    dot.style.top = data.y + "px";
+
+    box.appendChild(dot);
+
+    return dot.id;
+}
+
+function removeDot(data) {
+    var dot = document.getElementById(data.id);
+    box.removeChild(dot);
+}
+        </pre>
+    </details>
+
+    <script>
+        (function() {
+            var um = new JSUndoManager({
+                limit: 40,
+                debug: true,
+                bindHotKeys: true
+            });
+            var box = document.getElementById("demo-box");
+            var colours = ["red", "black", "blue", "green", "orange", "pink", "olive", "seagreen", "skyblue", "grey"];
+            var counter = 0;
+
+            box.addEventListener("click", function(e) {
+                var data = makeData(e.pageX, e.pageY);
+
+                // important: we separate data from DOM here;
+                // all dots are initialized with random color, so if we didn't remember it here in the data variable,
+                // each "redo" call would initialize new dot with a random color instead of creating same dot as before
+                um.execute({
+                    redo: function() { createDot(data); },
+                    undo: function() { removeDot(data); }
+                });
+            });
+
+            function makeData(x, y) {
+                counter++;
+
+                return {
+                    x: x,
+                    y: y,
+                    index: counter,
+                    id: "dot_" + counter,
+                    bg: colours[Math.floor(Math.random()*colours.length)]
+                };
+            }
+
+            function createDot(data) {
+                var dot = document.createElement("DIV");
+                dot.className = "dot";
+                dot.innerText = data.index;
+                dot.id = data.id;
+                dot.style.backgroundColor = data.bg;
+                dot.style.left = data.x + "px";
+                dot.style.top = data.y + "px";
+
+                box.appendChild(dot);
+
+                return dot.id;
+            }
+
+            function removeDot(data) {
+                var dot = document.getElementById(data.id);
+                box.removeChild(dot);
+            }
+        })();
+    </script>
+</body>
+</html>
