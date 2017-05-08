@@ -15,9 +15,10 @@
  * Default settings
  */
 const DEFAULTS = {
-    limit: 100,         // maximum commands stack size
-    debug: false,       // whether to emit execution status in console
-    bindHotKeys: false  // whether to bind "undo" and "redo" commands to "Ctrl+Z", "Ctrl+Y" & "Ctrl+Shift+Z" hot keys
+    limit: 100,             // maximum commands stack size
+    debug: false,           // whether to emit execution status in console
+    bindHotKeys: false,     // whether to bind "undo" and "redo" commands to "Ctrl+Z", "Ctrl+Y" & "Ctrl+Shift+Z" hot keys
+    useTransactions: true   // whether to initialize transactions manager
 };
 
 /**
@@ -28,16 +29,18 @@ class JSUndoManager {
     constructor(options) {
         options = assign({}, DEFAULTS, options);
 
-        this.transaction = new TransactionManager(this);
         this.limit = options.limit;
         this.options = options;
         this.reset();
 
-        this.log(`Initialized with stack limit of ${this.limit} commands`);
-
+        if (options.useTransactions) {
+            this.transaction = new TransactionManager(this);
+        }
         if (options.bindHotKeys) {
             this.bindHotKeys();
         }
+
+        this.log(`Initialized with stack limit of ${this.limit} commands`);
     }
 
     /**
@@ -268,6 +271,8 @@ class TransactionManager {
     constructor(tracker) {
         this.tracker = tracker;
         this._reset();
+
+        tracker.log("TransactionManager is initialized");
     }
 
     begin() {
