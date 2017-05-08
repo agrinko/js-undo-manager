@@ -32,14 +32,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      */
 
     var JSUndoManager = function () {
-        function JSUndoManager() {
-            var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
+        function JSUndoManager(options) {
             _classCallCheck(this, JSUndoManager);
 
-            options.limit = options.hasOwnProperty("limit") ? options.limit : DEFAULTS.limit;
-            options.debug = options.hasOwnProperty("debug") ? options.debug : DEFAULTS.debug;
-            options.bindHotKeys = options.hasOwnProperty("bindHotKeys") ? options.bindHotKeys : DEFAULTS.bindHotKeys;
+            options = assign({}, DEFAULTS, options);
 
             this.transaction = new TransactionManager(this);
             this.limit = options.limit;
@@ -403,9 +399,26 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     /////////// SOURCE CODE END ///////////////
 
+    // HELPER FUNCTIONS
+    /**
+     * Emulate ES6 Object.assign behaviour if native function is not defined
+     */
+    var assign = Object.assign || function (target) {
+        for (var i = 1; i < arguments.length; i++) {
+            for (var key in arguments[i]) {
+                if (arguments[i].hasOwnProperty(key)) {
+                    target[key] = arguments[i][key];
+                }
+            }
+        }
+
+        return target;
+    };
+
     // EXPOSING THE COMPONENT
+
+    // AMD style
     if (typeof define === "function" && define.amd) {
-        // AMD style
         define(function () {
             return JSUndoManager;
         });
