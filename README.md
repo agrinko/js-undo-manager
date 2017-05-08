@@ -150,7 +150,7 @@ input.addEventListener(`change`, function() {
 
 Then in your JS code:
 
-`require(`js-undo-manager`)`
+`require("js-undo-manager")`
 
 This will require minified file as a dependency.
 
@@ -226,7 +226,7 @@ if you are sure you're not going to use transactions.
 By default working with transactions is performed via `commandManager.transaction` reference, but it will be
 undefined if this setting is turned off.
 
-## Methods
+### Methods
 
 Most method are designed to be used in chain by returning `this` each time, e.g:
 
@@ -234,7 +234,7 @@ Most method are designed to be used in chain by returning `this` each time, e.g:
 commandManager.setLimit(55).undo().undo();
 ```
 
-### record({redo: Function, undo: Function}): JSUndoManager
+#### record({redo: Function, undo: Function}): JSUndoManager
 
 Alternative API: `record(Function, Function): JSUndoManager`
 
@@ -245,7 +245,7 @@ With alternative API the first argument refers to `redo` and the second - to `un
 Unlike with `execute` method, no functions are executed when calling `record`. See an example of when it might come in
 handy in [the "record" method](#the-record-method) section above.
 
-### execute({redo: Function, undo: Function}): JSUndoManager
+#### execute({redo: Function, undo: Function}): JSUndoManager
 
 Alternative API: `execute(Function, Function): JSUndoManager`
 
@@ -253,19 +253,19 @@ Record the command containing `redo` and `undo` functions **and** execute the `r
 
 See examples of usage above in the [examples](#examples) section.
 
-### undo(): JSUndoManager
+#### undo(): JSUndoManager
 
 Undo the last executed command by calling its `undo` function.
 
 Performs *no operation* if there is nothing to undo.
 
-### redo(): JSUndoManager
+#### redo(): JSUndoManager
 
 Redo the last "undone" command by calling its `redo` function.
 
 Performs *no operation* if there is nothing to redo.
 
-### setLimit(number): JSUndoManager
+#### setLimit(number): JSUndoManager
 
 Change stack size limit initially defined in the constructor options. Read more in [limit setting](#limit-number)
 description.
@@ -277,11 +277,11 @@ If there are currently more commands than the specified number that can be re-do
 will not be changed and a warning will be emitted in console. We can't cut commands from stack that are above the
 stack pointer (we only cut from tail).
 
-### reset(): JSUndoManager
+#### reset(): JSUndoManager
 
 Reset history stack entirely. The manager comes back to its initial state.
 
-### bindHotKeys(): JSUndoManager
+#### bindHotKeys(): JSUndoManager
 
 Bind `undo` and `redo` commands to `Ctrl+Z`, `Ctrl+Y` & `Ctrl+Shift+Z` hot keys.
 
@@ -289,27 +289,27 @@ Read more in [bindHotKeys](#bindhotkeys-boolean) setting description above.
 
 It can be called to bind the event handler dynamically when `bindHotKeys` setting was not set initially.
 
-### canUndo(): boolean
+#### canUndo(): boolean
 
 Check whether undoing is possible (i.e. if there is any command to undo).
 
-### canRedo(): boolean
+#### canRedo(): boolean
 
 Check whether redoing is possible (i.e. if there is any command to redo).
 
-### getSize(): number
+#### getSize(): number
 
 Get number of commands in the history stack.
 
-### isEmpty(): boolean
+#### isEmpty(): boolean
 
 Check whether the stack is empty.
 
-### isFull(): boolean
+#### isFull(): boolean
 
 Check whether the stack is full (i.e. its size has reached the [limit](#limit-number)).
 
-## Transactions
+### Transactions
 
 TransactionManager class is an extension over the JSUndoManager. It can be turned off by setting
 `useTransactions: false` in the constructor (read more above).
@@ -317,7 +317,7 @@ TransactionManager class is an extension over the JSUndoManager. It can be turne
 Interaction with transactions is performed via `commandManager.transaction` reference (assuming "commandManager" is an 
 instance of `JSUndoManager`). See [transactions example](#transactions-example) section above.
 
-### transaction.begin(): void
+#### transaction.begin(): void
 
 Set state of transaction to "in progress".
 
@@ -326,7 +326,7 @@ All the following commands will not be directly recorded in history stack but ra
 
 Running this method when a transaction is already in progress doesn't make any change.
 
-### transaction.end(): void
+#### transaction.end(): void
 
 Finish the transaction successfully.
 
@@ -334,7 +334,7 @@ All the transaction's commands are packed together in a sequence and recorded by
 
 Running this method when there is no transaction in progress doesn't make any change.
 
-### transaction.cancel(): void
+#### transaction.cancel(): void
 
 Cancel the transaction.
 
@@ -343,11 +343,11 @@ No command is recorded by JSUndoManager.
 
 Running this method when there is no transaction in progress doesn't make any change.
 
-### transaction.isInProgress(): boolean
+#### transaction.isInProgress(): boolean
 
 Check whether there is a transaction in progress currently.
 
-### transaction.isPending(): boolean
+#### transaction.isPending(): boolean
 
 Check if there is no transaction in progress currently.
 
