@@ -317,6 +317,11 @@ TransactionManager class is an extension over the JSUndoManager. It can be turne
 Interaction with transactions is performed via `commandManager.transaction` reference (assuming "commandManager" is an 
 instance of `JSUndoManager`). See [transactions example](#transactions-example) section above.
 
+> Note that transaction is recorded by Undo Manager only after calling its `end` method.
+If you execute `undo` method while transaction is in progress, its commands won't be affected since they are stored
+separately. Instead, previous commands will be undone. Only after you finish the transaction it will be possible to
+undo it in a batch.
+
 #### transaction.begin(): void
 
 Set state of transaction to "in progress".
@@ -359,5 +364,6 @@ The opposite of `transaction.isInProgress()`.
 - set up code coverage
 - extend transactions usage by using labels, etc.
 - support events and/or callbacks for interaction
+- limit transactions's sequence array (?)
 
 *Alexey Grinko, 2017 (c)*

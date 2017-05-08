@@ -44,7 +44,7 @@
         it's your browser's default behaviour. This example is programmed to work only with the buttons above.</p>
     <script>
         (function() {
-            var um = new JSUndoManager({debug:true});
+            var um = new JSUndoManager();
             var input = document.getElementById("input");
             var redo = document.getElementById("redo");
             var undo = document.getElementById("undo");
@@ -80,6 +80,14 @@
     <div id="demo-box"></div>
     <p>Now press <strong>Ctrl+Z</strong> to revert changes and <strong>Ctrl+Y</strong> or <strong>Ctrl+Shift+Z</strong>
         to perform them again</p>
+    <div>
+        Use these buttons to begin, end or cancel transaction and see how it works:
+        <div>
+            <button type="button" id="begin">Begin</button>
+            <button type="button" id="end">End</button>
+            <button type="button" id="cancel">Cancel</button>
+        </div>
+    </div>
     <p>This example works with up to 40 commands in history. When this number is reached, the oldes commands will be
         "forgotten" (you can't undo them). This number affects memory usage and can be dynamically adjusted in code.</p>
     <p>Check console to see some debug information from the command manager.</p>
@@ -89,57 +97,64 @@
     <details>
         <summary>Click here to see the source code</summary>
         <pre>
-var um = new JSUndoManager({
-    limit: 40,
-    debug: true,
-    bindHotKeys: true
-});
-var box = document.getElementById("demo-box");
-var colours = ["red", "black", "blue", "green", "orange", "pink", "olive", "seagreen", "skyblue", "grey"];
-var counter = 0;
-
-box.addEventListener("click", function(e) {
-    var data = makeData(e.pageX, e.pageY);
-
-    // important: we separate data from DOM here;
-    // all dots are initialized with random color, so if we didn't remember it here in the data variable,
-    // each "redo" call would initialize new dot with a random color instead of creating same dot as before
-    um.execute({
-        redo: function() { createDot(data); },
-        undo: function() { removeDot(data); }
+    var um = new JSUndoManager({
+        limit: 40,
+        debug: true,
+        bindHotKeys: true
     });
-});
+    var box = document.getElementById("demo-box");
+    var begin = document.getElementById("begin");
+    var end = document.getElementById("end");
+    var cancel = document.getElementById("cancel");
+    var colours = ["red", "black", "blue", "green", "orange", "pink", "olive", "seagreen", "skyblue", "grey"];
+    var counter = 0;
 
-function makeData(x, y) {
-    counter++;
+    box.addEventListener("click", function(e) {
+        var data = makeData(e.pageX, e.pageY);
 
-    return {
-        x: x,
-        y: y,
-        index: counter,
-        id: "dot_" + counter,
-        bg: colours[Math.floor(Math.random()*colours.length)]
-    };
-}
+        // important: we separate data from DOM here;
+        // all dots are initialized with random color, so if we didn't remember it here in the data variable,
+        // each "redo" call would initialize new dot with a random color instead of creating same dot as before
+        um.execute({
+            redo: function() { createDot(data); },
+            undo: function() { removeDot(data); }
+        });
+    });
 
-function createDot(data) {
-    var dot = document.createElement("DIV");
-    dot.className = "dot";
-    dot.innerText = data.index;
-    dot.id = data.id;
-    dot.style.backgroundColor = data.bg;
-    dot.style.left = data.x + "px";
-    dot.style.top = data.y + "px";
+    begin.addEventListener("click", function() { um.transaction.begin(); });
+    end.addEventListener("click", function() { um.transaction.end(); });
+    cancel.addEventListener("click", function() { um.transaction.cancel(); });
 
-    box.appendChild(dot);
+    function makeData(x, y) {
+        counter++;
 
-    return dot.id;
-}
+        return {
+            x: x,
+            y: y,
+            index: counter,
+            id: "dot_" + counter,
+            bg: colours[Math.floor(Math.random()*colours.length)]
+        };
+    }
 
-function removeDot(data) {
-    var dot = document.getElementById(data.id);
-    box.removeChild(dot);
-}
+    function createDot(data) {
+        var dot = document.createElement("DIV");
+        dot.className = "dot";
+        dot.innerText = data.index;
+        dot.id = data.id;
+        dot.style.backgroundColor = data.bg;
+        dot.style.left = data.x + "px";
+        dot.style.top = data.y + "px";
+
+        box.appendChild(dot);
+
+        return dot.id;
+    }
+
+    function removeDot(data) {
+        var dot = document.getElementById(data.id);
+        box.removeChild(dot);
+    }
         </pre>
     </details>
 
@@ -151,6 +166,9 @@ function removeDot(data) {
                 bindHotKeys: true
             });
             var box = document.getElementById("demo-box");
+            var begin = document.getElementById("begin");
+            var end = document.getElementById("end");
+            var cancel = document.getElementById("cancel");
             var colours = ["red", "black", "blue", "green", "orange", "pink", "olive", "seagreen", "skyblue", "grey"];
             var counter = 0;
 
@@ -165,6 +183,10 @@ function removeDot(data) {
                     undo: function() { removeDot(data); }
                 });
             });
+
+            begin.addEventListener("click", function() { um.transaction.begin(); });
+            end.addEventListener("click", function() { um.transaction.end(); });
+            cancel.addEventListener("click", function() { um.transaction.cancel(); });
 
             function makeData(x, y) {
                 counter++;
