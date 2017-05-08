@@ -42,7 +42,7 @@ this):
 
 ```javascript
 // CommonJS style
-var UndoManager = require(`js-undo-manager`);
+var UndoManager = require("js-undo-manager");
 
 var um = new UndoManager();
 var i = 0;
@@ -66,7 +66,6 @@ Example of transactions:
 
 ```javascript
 // Global object
-
 var undoManager = new JSUndoManager();
 var i = 0;
 
@@ -123,10 +122,11 @@ var input = document.getElementById(`some-input`);
 var prevValue = input.value; // way to know previous value after `change` event
 
 input.addEventListener(`change`, function() {
+    // these variables are stuck in the function's closure and used repeatedly by 'redo' and 'undo' functions
     var prev = prevValue;
     var value = input.value;
 
-    prevValue = value;
+    prevValue = value; // update prevValue for the next time
 
     um.record({
         redo: function() {
